@@ -6,6 +6,8 @@ function App() {
     input: "",
   });
 
+  const [messages, setMessages] = useState<string[]>([]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -13,8 +15,24 @@ function App() {
     });
   };
 
+  const handleSubmit = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    setMessages([...messages, formData.input]);
+    setFormData({
+      ...formData,
+      input: "",
+    });
+  };
+
   return (
     <div className="App">
+      <ul id="messages">
+        {messages.map((msg) => (
+          <li>{msg}</li>
+        ))}
+      </ul>
       <form id="form" action="">
         <input
           id="input"
@@ -23,7 +41,7 @@ function App() {
           value={formData.input}
           onChange={handleChange}
         />
-        <button>Send</button>
+        <button onClick={handleSubmit}>Send</button>
       </form>
     </div>
   );
