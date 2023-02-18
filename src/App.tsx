@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
+import io from "socket.io-client";
+
+const SOCKETIO_HOST = "https://nodesocketioaksato.azurewebsites.net/";
+const socket = io(SOCKETIO_HOST);
 
 function App() {
   const [formData, setFormData] = useState({
@@ -7,6 +11,12 @@ function App() {
   });
 
   const [messages, setMessages] = useState<string[]>([]);
+
+  useEffect(() => {
+    socket.on("chat message", (msg) => {
+      setMessages((oldMessages) => [...oldMessages, msg]);
+    });
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -19,7 +29,7 @@ function App() {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    setMessages([...messages, formData.input]);
+    socket.emit("chat message", formData.input);
     setFormData({
       ...formData,
       input: "",
@@ -29,11 +39,11 @@ function App() {
   return (
     <div className="App">
       <ul id="messages">
-        {messages.map((msg) => (
-          <li>{msg}</li>
+        {messages.map((msg, index) => (
+          <li key={index}>{msg}</li>
         ))}
       </ul>
-      <form id="form" action="">
+      <form id="form">
         <input
           id="input"
           name="input"
